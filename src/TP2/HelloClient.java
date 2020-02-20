@@ -4,11 +4,13 @@ import java.io.Serializable;
 import java.rmi.*;
 import java.rmi.registry.*;
 
-public class HelloClient implements Info_itf, Serializable {
+public class HelloClient implements Info_itf, Serializable, Accounting_itf {
+
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 7991929566753861754L;
 
 	public static void main(String[] args) {
 
@@ -23,9 +25,15 @@ public class HelloClient implements Info_itf, Serializable {
 			// Get remote object reference
 			Registry registry = LocateRegistry.getRegistry(host);
 			Hello h = (Hello) registry.lookup("HelloService");
+			Hello2 h2 = (Hello2) registry.lookup("HelloService2");
+			Registry_itf r = (Registry_itf) registry.lookup("RegistryService");
 
+			HelloClient c = new HelloClient();
+			r.register(c);
 			// Remote method invocation
-			String res = h.sayHello(new HelloClient());
+			int res = h2.sayHello(c);
+			res = h2.sayHello(c);
+			res = h2.sayHello(c);
 			System.out.println(res);
 
 		} catch (Exception e) {
@@ -35,6 +43,11 @@ public class HelloClient implements Info_itf, Serializable {
 
 	@Override
 	public String getName() throws RemoteException {
-		return "Client 1";
+		return "ID" + serialVersionUID;
+	}
+
+	@Override
+	public void numberOfCalls(int number) throws RemoteException {
+		System.out.println("Number of calls already done: " + number);
 	}
 }
