@@ -1,3 +1,5 @@
+package TP1;
+
 public interface Calculator_itf {
 	public int plus(int lhs, int rhs);
 

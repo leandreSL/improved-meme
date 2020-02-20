@@ -1,3 +1,5 @@
+package TP1;
+
 public class Calculator implements Calculator_itf {
 	@Override
 	public int plus(int lhs, int rhs) {

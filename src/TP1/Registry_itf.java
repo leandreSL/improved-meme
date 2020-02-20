@@ -1,3 +1,5 @@
+package TP1;
+
 
 interface Registry_itf {
 	public void add(Person p);
