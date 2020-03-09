@@ -1,6 +1,8 @@
 package Chat;
 
 import java.rmi.server.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,20 +35,28 @@ public class Server implements ServerService {
 		System.out.println(msg);
 		//history.addMessage(msg);
 		
-		for (ClientService c: this.clients) {
-			if (c.getId().equals(msg.getId())) continue;
-			c.receiveMessage(msg);
-		}
+		this.broadcast(msg);
 	}
 
 	@Override
 	public void disconnect(ClientService client, String name) throws RemoteException {
 		clients.remove(client);
-		System.out.println(name + " a quittÃ© le chat");
+		
+		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+		Message msg = new Message(client.getId(), name, name + " a quitté le chat", LocalTime.now().format(timeFormatter));
+		this.broadcast(msg);
+		System.out.println(name + " a quitté le chat");
 	}
 
 	@Override
 	public String getHistory() throws RemoteException {
 		return history.toString();
+	}
+	
+	public void broadcast (Message msg) throws RemoteException {
+		for (ClientService c: this.clients) {
+			if (c.getId().equals(msg.getId())) continue;
+			c.receiveMessage(msg);
+		}
 	}
 }
