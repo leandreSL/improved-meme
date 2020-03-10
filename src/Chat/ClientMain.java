@@ -17,7 +17,6 @@ public class ClientMain {
 			}
 
 			String host = args[0];
-			Message m;
 			// Get remote object reference
 			Registry registry = LocateRegistry.getRegistry(host);
 			ServerService serverService = (ServerService) registry.lookup("ServerService");
@@ -35,21 +34,30 @@ public class ClientMain {
             System.out.println("Bienvenue. \nEntrez \"!exit\" pour quitter");
             System.out.println("Entrez \"!history\" pour avoir l'historique du chat");
 			String userInput;
+			Message msg;
+			System.out.print(client.getName() + ": ");
 			while ((userInput = scanner.nextLine()) != null) {
 				if (userInput.equals("!exit")) {
-					serverService.disconnect(client_stub, client.getName());
-					System.exit(0);
-					return;
+					break;
 				}
 				else if (userInput.equals("!history")) {
-					System.out.println(serverService.getHistory());
+					System.out.print(serverService.getHistory());
+					continue;
 				}
 				
 				DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-				m = new Message(client.getId(), client.getName(), userInput, LocalTime.now().format(timeFormatter));
+				msg = new Message(client.getId(), client.getName(), userInput, LocalTime.now().format(timeFormatter));
 				// Remote method invocation
-				serverService.sendMessage(m);
+				serverService.sendMessage(msg);
+				System.out.print(String.format("\033[%dA",1)); // Move up
+				System.out.println(msg);
+				System.out.print(client.getName() + ": ");
 			}
+			
+			serverService.disconnect(client_stub, client.getName());
+			registry.unbind(client.getId().toString());
+			System.exit(0);
+			return;
 
 		} catch (Exception e) {
 			System.err.println("Error on client: " + e);

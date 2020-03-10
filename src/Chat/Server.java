@@ -1,14 +1,9 @@
 package Chat;
 
-import java.rmi.server.*;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.rmi.RemoteException;
-import java.rmi.registry.*;
 
 public class Server implements ServerService {
 	private static Server instance;
@@ -27,13 +22,25 @@ public class Server implements ServerService {
 
 	@Override
 	public void register (ClientService client) throws RemoteException {
+		String msg = client.getName() + " a rejoint le chat";
+		history.addMessage(msg);
+		for (ClientService c: this.clients) {
+			try {
+				c.receiveMessage(msg);
+			}
+			catch (Exception e) {
+				
+			}
+		}
+		System.out.println(msg);
+		
 		clients.add(client);
 	}
 	
 	@Override	
 	public void sendMessage (Message msg) throws RemoteException {
 		System.out.println(msg);
-		//history.addMessage(msg);
+		history.addMessage(msg);
 		
 		for (ClientService c: this.clients) {
 			if (c.getId().equals(msg.getId())) continue;
@@ -46,6 +53,7 @@ public class Server implements ServerService {
 		clients.remove(client);
 		
 		String msg = name + " a quitté le chat";
+		history.addMessage(msg);
 		for (ClientService c: this.clients) {
 			c.receiveMessage(msg);
 		}
@@ -54,6 +62,8 @@ public class Server implements ServerService {
 
 	@Override
 	public String getHistory() throws RemoteException {
-		return history.toString();
+		String string_history = history.toString();
+		System.out.println(string_history);
+		return string_history;
 	}
 }
