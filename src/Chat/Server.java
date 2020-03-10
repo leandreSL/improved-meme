@@ -35,28 +35,25 @@ public class Server implements ServerService {
 		System.out.println(msg);
 		//history.addMessage(msg);
 		
-		this.broadcast(msg);
+		for (ClientService c: this.clients) {
+			if (c.getId().equals(msg.getId())) continue;
+			c.receiveMessage(msg);
+		}
 	}
 
 	@Override
 	public void disconnect(ClientService client, String name) throws RemoteException {
 		clients.remove(client);
 		
-		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-		Message msg = new Message(client.getId(), name, name + " a quitté le chat", LocalTime.now().format(timeFormatter));
-		this.broadcast(msg);
-		System.out.println(name + " a quitté le chat");
+		String msg = name + " a quittÃ© le chat";
+		for (ClientService c: this.clients) {
+			c.receiveMessage(msg);
+		}
+		System.out.println(msg);
 	}
 
 	@Override
 	public String getHistory() throws RemoteException {
 		return history.toString();
-	}
-	
-	public void broadcast (Message msg) throws RemoteException {
-		for (ClientService c: this.clients) {
-			if (c.getId().equals(msg.getId())) continue;
-			c.receiveMessage(msg);
-		}
 	}
 }
