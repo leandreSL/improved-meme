@@ -12,8 +12,15 @@ public class History {
 	FileReader historyFileReader;
 	String filepath = "/tmp/historyMsgs.txt";
 	public History() {
+		String base = "";
+		try {
+			base = new String(Files.readAllBytes(Paths.get(this.filepath)), StandardCharsets.UTF_8);
+		} catch (IOException e) {}
+		
 		try {
 			historyFileWriter = new FileWriter(filepath);
+			historyFileWriter.write(base);
+			historyFileWriter.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
