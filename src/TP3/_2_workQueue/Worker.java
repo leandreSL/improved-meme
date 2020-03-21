@@ -1,10 +1,14 @@
-package workQueue;
+package _2_workQueue;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
+/**
+ * "The assumption behind a work queue is that each task is delivered to exactly one worker"
+ *
+ */
 public class Worker {
 
   private static final String TASK_QUEUE_NAME = "task_queue";
