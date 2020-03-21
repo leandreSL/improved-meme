@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="src" path=""/>
-	<classpathentry kind="output" path=""/>
+	<classpathentry kind="src" path="TP3"/>
+	<classpathentry kind="lib" path="/home/c/cappaf/eclipse-workspace/improved-meme/src/amqp-client-5.7.1.jar"/>
+	<classpathentry kind="lib" path="/home/c/cappaf/eclipse-workspace/improved-meme/src/slf4j-api-1.7.26.jar"/>
+	<classpathentry kind="lib" path="/home/c/cappaf/eclipse-workspace/improved-meme/src/slf4j-simple-1.7.26.jar"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

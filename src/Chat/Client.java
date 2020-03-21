@@ -30,4 +30,9 @@ public class Client implements ClientService {
 		System.out.println(msg);
 	}
 
+	@Override
+	public void receiveMessage(String msg) throws RemoteException {
+		System.out.println(msg);
+	}
+
 }

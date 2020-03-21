@@ -9,4 +9,5 @@ public interface ClientService extends Remote {
 	public UID getId() throws RemoteException;
 	
 	public void receiveMessage(Message msg) throws RemoteException;
+	public void receiveMessage(String msg) throws RemoteException;
 }

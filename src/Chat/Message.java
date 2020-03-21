@@ -23,7 +23,7 @@ public class Message implements Serializable {
 	}
 
 	public String toString() {
-		return name + " - " + time  + ": " + message;
+		return time + " - " + name + ": " + message;
 	}
 	
 	public String getId () {
