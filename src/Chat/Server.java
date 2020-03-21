@@ -43,9 +43,9 @@ public class Server implements ServerService {
 		clients.remove(client);
 		
 		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-		Message msg = new Message(client.getId(), name, name + " a quitté le chat", LocalTime.now().format(timeFormatter));
+		Message msg = new Message("Message système", name, name + " a quitté le chat", LocalTime.now().format(timeFormatter));
 		this.broadcast(msg);
-		System.out.println(name + " a quitté le chat");
+		System.out.println(msg);
 	}
 
 	@Override

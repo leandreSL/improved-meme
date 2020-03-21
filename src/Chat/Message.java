@@ -10,12 +10,12 @@ public class Message implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -6970524661461216310L;
-	private UID id;
+	private String id;
 	private String name;
 	private String message;
 	private String time;
 	
-	public Message(UID id, String name, String message, String time) {
+	public Message(String id, String name, String message, String time) {
 		this.id = id;
 		this.name = name;
 		this.message = message;
@@ -26,7 +26,7 @@ public class Message implements Serializable {
 		return name + " - " + time  + ": " + message;
 	}
 	
-	public UID getId () {
+	public String getId () {
 		return this.id;
 	}
 }

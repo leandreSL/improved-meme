@@ -46,7 +46,7 @@ public class ClientMain {
 				}
 				
 				DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-				m = new Message(client.getId(), client.getName(), userInput, LocalTime.now().format(timeFormatter));
+				m = new Message(client.getId().toString(), client.getName(), userInput, LocalTime.now().format(timeFormatter));
 				// Remote method invocation
 				serverService.sendMessage(m);
 			}
