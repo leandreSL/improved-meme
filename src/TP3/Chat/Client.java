@@ -1,9 +1,8 @@
 package Chat;
 
-import java.rmi.*;
 import java.rmi.server.UID;
 
-public class Client implements ClientService {
+public class Client {
 	private UID id;
 	private String name;
 	
@@ -11,28 +10,16 @@ public class Client implements ClientService {
 		this.id = new UID();
 	}
 	
-	@Override	
-	public UID getId() throws RemoteException {
+	public UID getId () {
 		return this.id;
 	}
 	
-	@Override
-	public String getName() throws RemoteException {
+	public String getName () {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName (String name) {
 		this.name = name;
-	}
-
-	@Override
-	public void receiveMessage(Message msg) throws RemoteException {
-		System.out.println(msg);
-	}
-
-	@Override
-	public void receiveMessage(String msg) throws RemoteException {
-		System.out.println(msg);
 	}
 
 }
