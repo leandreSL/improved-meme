@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path=""/>
+	<classpathentry kind="lib" path="C:/Users/Florian/eclipse-workspace/improved-meme/src/amqp-client-5.7.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://rabbitmq.github.io/rabbitmq-java-client/api/current/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Florian/eclipse-workspace/improved-meme/src/slf4j-api-1.7.26.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://rabbitmq.github.io/rabbitmq-java-client/api/current/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Florian/eclipse-workspace/improved-meme/src/slf4j-simple-1.7.26.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="https://rabbitmq.github.io/rabbitmq-java-client/api/current/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path=""/>
+</classpath>
