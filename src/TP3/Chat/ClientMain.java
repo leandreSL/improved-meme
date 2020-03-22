@@ -1,9 +1,6 @@
 package Chat;
 
 import java.io.IOException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -15,7 +12,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
 public class ClientMain {
-private static final String EXCHANGE_NAME = "chat_server_exchange";
+	private static final String EXCHANGE_NAME = "chat_server_exchange";
     
 	public static void main(String[] args) {
 		try (Scanner scanner = new Scanner(System.in)) {			
@@ -41,14 +38,12 @@ private static final String EXCHANGE_NAME = "chat_server_exchange";
             System.out.println("Entrez \"!history\" pour avoir l'historique du chat");
 			String userInput;
 			Message message;
-			System.out.print(client.getName() + ": ");
 			while ((userInput = scanner.nextLine()) != null) {
 				if (userInput.equals("!exit")) {
 					break;
 				}
 				else if (userInput.equals("!history")) {
-					//System.out.print(serverService.getHistory());
-					// TODO
+					channel.basicPublish(EXCHANGE_NAME, "askHistory", null, ByteSerializable.getBytes(client.getId()));
 					continue;
 				}
 				
@@ -57,10 +52,9 @@ private static final String EXCHANGE_NAME = "chat_server_exchange";
 				// Remote method invocation
 				channel.basicPublish(EXCHANGE_NAME, "sendMessage", null, ByteSerializable.getBytes(message));
 				System.out.print(String.format("\033[%dA",1)); // Move up
-				System.out.print(client.getName() + ": ");
 			}
 			
-			//serverService.disconnect(client_stub, client.getName());
+			channel.basicPublish(EXCHANGE_NAME, "disconnect", null, ByteSerializable.getBytes(client));
 			System.exit(1);
 			return;
 
@@ -79,6 +73,13 @@ private static final String EXCHANGE_NAME = "chat_server_exchange";
 	        DeliverCallback deliverCallbackReceiveMessage = (consumerTag, delivery) -> {
 	        	Message message = (Message) ByteSerializable.fromBytes(delivery.getBody());
 				System.out.println(message);
+	        };
+	        channel.basicConsume(queueNameReceiveMessage, true, deliverCallbackReceiveMessage, consumerTag -> {});
+	        
+	        // Callback and subscribe for when the client receives the history
+	        DeliverCallback deliverCallbackReceiveHistory = (consumerTag, delivery) -> {
+	        	String history  = (String) ByteSerializable.fromBytes(delivery.getBody());
+				System.out.println(history);
 	        };
 	        channel.basicConsume(queueNameReceiveMessage, true, deliverCallbackReceiveMessage, consumerTag -> {});
 			

@@ -1,18 +1,9 @@
 package Chat;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.DeliverCallback;
-
 import java.io.IOException;
-import java.rmi.RemoteException;
-import java.rmi.server.UID;
 
 public class Server {    
 	private static Server instance;
@@ -58,10 +49,10 @@ public class Server {
 	}
 
 
-	public void disconnect(Client client, String name) throws RemoteException {
-		clients_id.remove(client);
+	public void disconnect(Client client) {
+		clients_id.remove(client.getId());
 
-		Message message = new SystemMessage(name + " a quitté le chat");
+		Message message = new SystemMessage(client.getName() + " a quitté le chat");
 		history.addMessage(message);
 		System.out.println(message);
 		this.broadcast(message);
@@ -81,9 +72,15 @@ public class Server {
 	}
 
 
-	public String getHistory() {
+	public void sendHistoryTo (String client_id) {
 		String string_history = history.toString();
-		System.out.println(string_history);
-		return string_history;
+		byte[] message = ByteSerializable.getBytes(new HistoryMessage(string_history));
+		
+		try {
+			channel.basicPublish(this.EXCHANGE_NAME, client_id, null, message);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

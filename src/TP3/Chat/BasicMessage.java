@@ -1,6 +1,10 @@
 package Chat;
 
 public class BasicMessage implements Message {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3404352026697230016L;
 	private String id;
 	private String name;
 	private String message;

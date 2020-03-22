@@ -10,23 +10,37 @@ import java.nio.file.Paths;
 public class History {
 	FileWriter historyFileWriter;
 	FileReader historyFileReader;
-	String filepath = "/tmp/historyMsgs.txt";
-	String filepath2 = "historyMsgs.txt";
+	String filepath;
+	String usable_filepath = "/tmp/historyMsgs.txt";
+	String usable_filepath2 = "historyMsgs.txt";
 	public History() {
 		String base = "";
 		try {
-			base = new String(Files.readAllBytes(Paths.get(this.filepath)), StandardCharsets.UTF_8);
-		} catch (IOException e) {}
+			base = new String(Files.readAllBytes(Paths.get(this.usable_filepath)), StandardCharsets.UTF_8);
+			filepath = usable_filepath;
+		} catch (IOException e) {
+			
+		}
 		
 		try {
-			historyFileWriter = new FileWriter(filepath);
+			historyFileWriter = new FileWriter(usable_filepath);
 			historyFileWriter.write(base);
 			historyFileWriter.flush();
+			filepath = usable_filepath;
 		} catch (IOException e) {
 			try {
-				historyFileWriter = new FileWriter(filepath2);
+				base = new String(Files.readAllBytes(Paths.get(this.usable_filepath2)), StandardCharsets.UTF_8);
+				filepath = usable_filepath2;
+			}
+			catch (IOException e1) {
+				
+			}
+			
+			try {
+				historyFileWriter = new FileWriter(usable_filepath2);
 				historyFileWriter.write(base);
 				historyFileWriter.flush();
+				filepath = usable_filepath2;
 			}
 			catch (IOException e2) {
 				e2.printStackTrace();

@@ -1,8 +1,9 @@
-Jean a rejoint le chat
-16:51:48 - Jean: Yo
-16:51:50 - Jean: Ã§a va ?
 Paul a rejoint le chat
-16:52:19 - Paul: Tu suces
-16:52:22 - Paul: Des gros
-16:52:24 - Paul: chibres
-16:52:25 - Paul: Jean
+17:28:45 - Paul: Bonjour
+Jean a rejoint le chat
+17:28:53 - Jean: Bonsoir
+17:29:00 - Jean: Je demande l'historique
+17:29:11 - Jean: Je vois que paul est arrivÃ© avant !!
+17:29:12 - Jean: au revoir
+Jean a quitté le chat
+Paul a quitté le chat

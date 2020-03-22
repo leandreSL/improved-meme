@@ -3,6 +3,10 @@ package Chat;
 import java.io.Serializable;
 
 public class Client implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1333817325751769421L;
 	private String id;
 	private String name;
 	
