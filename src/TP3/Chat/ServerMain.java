@@ -15,14 +15,14 @@ public class ServerMain {
 	        Connection connection = factory.newConnection();
 	        
 	        Channel channelJoin = connection.createChannel();
-	        channelJoin.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT);
+	        channelJoin.exchangeDeclare(EXCHANGE_NAME, "fanout");
 	        String queueNameJoin = channelJoin.queueDeclare().getQueue();
-	        channelJoin.queueBind(queueNameJoin, EXCHANGE_NAME, "join");
+	        channelJoin.queueBind(queueNameJoin, EXCHANGE_NAME, "");
 	        
 	        Channel channelSendMessage = connection.createChannel();
-	        channelSendMessage.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT);
+	        channelSendMessage.exchangeDeclare(EXCHANGE_NAME, "fanout");
 	        String queueNameSendMessage = channelSendMessage.queueDeclare().getQueue();
-	        channelSendMessage.queueBind(queueNameSendMessage, EXCHANGE_NAME, "sendMessage");
+	        channelSendMessage.queueBind(queueNameSendMessage, EXCHANGE_NAME, "");
 	        			
 			System.out.println("Server ready");
 
