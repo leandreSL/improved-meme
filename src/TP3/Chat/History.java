@@ -11,6 +11,7 @@ public class History {
 	FileWriter historyFileWriter;
 	FileReader historyFileReader;
 	String filepath = "/tmp/historyMsgs.txt";
+	String filepath2 = "historyMsgs.txt";
 	public History() {
 		String base = "";
 		try {
@@ -22,7 +23,14 @@ public class History {
 			historyFileWriter.write(base);
 			historyFileWriter.flush();
 		} catch (IOException e) {
-			e.printStackTrace();
+			try {
+				historyFileWriter = new FileWriter(filepath2);
+				historyFileWriter.write(base);
+				historyFileWriter.flush();
+			}
+			catch (IOException e2) {
+				e2.printStackTrace();
+			}
 		}
 	}
 	public void addMessage(Message msg) {

@@ -2,66 +2,86 @@ package Chat;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.rmi.RemoteException;
+import java.util.Map;
 
-public class Server implements ServerService {
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.DeliverCallback;
+
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.rmi.server.UID;
+
+public class Server {    
 	private static Server instance;
-	private List<ClientService> clients;
+    private List<String> clients_id;
 	private History history;
+	private final String EXCHANGE_NAME;
+	private Channel channel;
 	
-	private Server() {
-		this.clients = Collections.synchronizedList(new ArrayList<ClientService>());
+	private Server(String EXCHANGE_NAME, Channel channel) {
+		this.EXCHANGE_NAME = EXCHANGE_NAME;
+		this.clients_id = new ArrayList<String>();
 		this.history = new History();
+		this.channel = channel;
 	}
 	
-	public static Server getInstance () {
-		if (instance == null) instance = new Server();
+	public static Server getInstance (String EXCHANGE_NAME, Channel channel) {
+		if (instance == null) instance = new Server(EXCHANGE_NAME, channel);
 		return instance;
 	}
 
-	@Override
-	public void register (ClientService client) throws RemoteException {
-		String msg = client.getName() + " a rejoint le chat";
-		history.addMessage(msg);
-		for (ClientService c: this.clients) {
-			try {
-				c.receiveMessage(msg);
-			}
-			catch (Exception e) {
-				
-			}
+	public void register (Client client) {
+        try {
+            String queueNameReceiveMessage = this.channel.queueDeclare().getQueue();
+			this.channel.queueBind(queueNameReceiveMessage, EXCHANGE_NAME, "receiveMessage");
 		}
-		System.out.println(msg);
+        catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
 		
-		clients.add(client);
+        Message message = new SystemMessage(client.getName() + " a rejoint le chat");
+		history.addMessage(message);
+		System.out.println(message);
+		this.broadcast(message);
+		
+		clients_id.add(client.getId());
 	}
 	
-	@Override	
-	public void sendMessage (Message msg) throws RemoteException {
-		System.out.println(msg);
-		history.addMessage(msg);
+	public void sendMessage (Message message) {
+		history.addMessage(message);
+		System.out.println(message);
+		this.broadcast(message);
+	}
+
+
+	public void disconnect(Client client, String name) throws RemoteException {
+		clients_id.remove(client);
+
+		Message message = new SystemMessage(name + " a quitté le chat");
+		history.addMessage(message);
+		System.out.println(message);
+		this.broadcast(message);
+	}
+
+	private void broadcast(Message message) {
+		byte[] msg = ByteSerializable.getBytes(message);
 		
-		for (ClientService c: this.clients) {
-			if (c.getId().equals(msg.getId())) continue;
-			c.receiveMessage(msg);
+		for (String clientReceiveQueueName: this.clients_id) {
+			try {
+				channel.basicPublish(this.EXCHANGE_NAME, clientReceiveQueueName, null, msg);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
-	@Override
-	public void disconnect(ClientService client, String name) throws RemoteException {
-		clients.remove(client);
 
-		String msg = name + " a quittÃ© le chat";
-		history.addMessage(msg);
-		for (ClientService c: this.clients) {
-			c.receiveMessage(msg);
-		}
-		System.out.println(msg);
-	}
-
-	@Override
-	public String getHistory() throws RemoteException {
+	public String getHistory() {
 		String string_history = history.toString();
 		System.out.println(string_history);
 		return string_history;

@@ -1,5 +1,6 @@
 package Chat;
 
+import java.io.IOException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -7,61 +8,85 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
+import com.rabbitmq.client.BuiltinExchangeType;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.DeliverCallback;
+
 public class ClientMain {
+private static final String EXCHANGE_NAME = "chat_server_exchange";
+    
 	public static void main(String[] args) {
+		try (Scanner scanner = new Scanner(System.in)) {			
+			ConnectionFactory factory = new ConnectionFactory();
+	        factory.setHost("localhost");
+	        Connection connection = factory.newConnection();
+	        
+	        Channel channel = connection.createChannel();
+	        channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT);
+	        String queueName = channel.queueDeclare().getQueue();
 
-		try (Scanner scanner = new Scanner(System.in)) {
-			if (args.length < 1) {
-				System.out.println("Usage: java HelloClient <rmiregistry host>");
-				return;
-			}
+	        // For the client to join the chat
+	        channel.queueBind(queueName, EXCHANGE_NAME, "join");
+	        // For the client to send a message
+	        channel.queueBind(queueName, EXCHANGE_NAME, "sendMessage");
 
-			String host = args[0];
-			// Get remote object reference
-			Registry registry = LocateRegistry.getRegistry(host);
-			ServerService serverService = (ServerService) registry.lookup("ServerService");
-
-			// Create a Client remote object			
-			Client client = new Client();
-			ClientService clientService = (ClientService) client;
-			ClientService client_stub = (ClientService) UnicastRemoteObject.exportObject(clientService, 0);
-			registry.bind(client.getId().toString(), client_stub);
-
+	        Client client = new Client();
 			System.out.print("Veuillez entrer votre pseudo :\n");
             client.setName(scanner.nextLine());
-			serverService.register(client_stub);
+			register(client, channel);
             
             System.out.println("Bienvenue. \nEntrez \"!exit\" pour quitter");
             System.out.println("Entrez \"!history\" pour avoir l'historique du chat");
 			String userInput;
-			Message msg;
+			Message message;
 			System.out.print(client.getName() + ": ");
 			while ((userInput = scanner.nextLine()) != null) {
 				if (userInput.equals("!exit")) {
 					break;
 				}
 				else if (userInput.equals("!history")) {
-					System.out.print(serverService.getHistory());
+					//System.out.print(serverService.getHistory());
+					// TODO
 					continue;
 				}
 				
 				DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-				msg = new Message(client.getId().toString(), client.getName(), userInput, LocalTime.now().format(timeFormatter));
+				message = new BasicMessage(client.getId().toString(), client.getName(), userInput, LocalTime.now().format(timeFormatter));
 				// Remote method invocation
-				serverService.sendMessage(msg);
+				channel.basicPublish(EXCHANGE_NAME, "sendMessage", null, ByteSerializable.getBytes(message));
 				System.out.print(String.format("\033[%dA",1)); // Move up
-				System.out.println(msg);
 				System.out.print(client.getName() + ": ");
 			}
 			
-			serverService.disconnect(client_stub, client.getName());
-			registry.unbind(client.getId().toString());
-			System.exit(0);
+			//serverService.disconnect(client_stub, client.getName());
+			System.exit(1);
 			return;
 
 		} catch (Exception e) {
 			System.err.println("Error on client: " + e);
 		}
+	}
+	
+	private static void register(Client client, Channel channel) {
+		try {
+			String queueNameReceiveMessage = channel.queueDeclare().getQueue();
+			channel.queueBind(queueNameReceiveMessage, EXCHANGE_NAME, queueNameReceiveMessage);
+			client.setId(queueNameReceiveMessage);
+			
+			// Callback and subscribe for when the client receives a message from the server
+	        DeliverCallback deliverCallbackReceiveMessage = (consumerTag, delivery) -> {
+	        	Message message = (Message) ByteSerializable.fromBytes(delivery.getBody());
+				System.out.println(message);
+	        };
+	        channel.basicConsume(queueNameReceiveMessage, true, deliverCallbackReceiveMessage, consumerTag -> {});
+			
+			channel.basicPublish(EXCHANGE_NAME, "join", null, ByteSerializable.getBytes(client));
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}	
 	}
 
 }

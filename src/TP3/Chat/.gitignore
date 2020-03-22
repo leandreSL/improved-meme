@@ -6,3 +6,7 @@
 /Server.class
 /ServerMain.class
 /ServerService.class
+/ByteSerializable.class
+/ByteSerializableInf.class
+/SystemMessage.class
+/BasicMessage.class

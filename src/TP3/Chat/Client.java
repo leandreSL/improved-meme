@@ -1,17 +1,21 @@
 package Chat;
 
-import java.rmi.server.UID;
+import java.io.Serializable;
 
-public class Client {
-	private UID id;
+public class Client implements Serializable {
+	private String id;
 	private String name;
 	
 	public Client () {
-		this.id = new UID();
+		this.id = null;
 	}
 	
-	public UID getId () {
+	public String getId () {
 		return this.id;
+	}
+
+	public void setId(String queueNameReceiveMessage) {
+		this.id = queueNameReceiveMessage;
 	}
 	
 	public String getName () {

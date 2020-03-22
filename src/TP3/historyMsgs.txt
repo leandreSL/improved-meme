@@ -1,0 +1,5 @@
+Jean a rejoint le chat
+16:21:58 - Jean: test
+16:22:03 - Jean: oui
+paul a rejoint le chat
+16:22:32 - paul: ça va ?
